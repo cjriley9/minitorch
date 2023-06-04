@@ -31,13 +31,15 @@ class Module:
 
     def train(self) -> None:
         "Set the mode of this module and all descendent modules to `train`."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        self.training = True
+        for k, v in self._modules.items():
+            v.train()
 
     def eval(self) -> None:
         "Set the mode of this module and all descendent modules to `eval`."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        self.training = False
+        for k, v in self._modules.items():
+            v.eval()
 
     def named_parameters(self) -> Sequence[Tuple[str, Parameter]]:
         """
@@ -47,13 +49,28 @@ class Module:
         Returns:
             The name and `Parameter` of each ancestor parameter.
         """
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        parameter_list: list[Tuple(str, Parameter)] = []
+        search_list: list[Tuple(str, Module)] = [("",self)]
+        while len(search_list):
+            name, mod = search_list.pop()
+            # add the period delimiter
+            if len(name):
+                name += "."
+            for k, v in mod._parameters.items():
+                parameter_list.append((name + k, v))
+            for k, v in mod._modules.items():
+                search_list.append((name + k, v))
+        return parameter_list
 
     def parameters(self) -> Sequence[Parameter]:
         "Enumerate over all the parameters of this module and its descendents."
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        parameter_list: Sequence[Parameter] = []
+        search_list: Sequence[Module] = [self]
+        while len(search_list):
+            mod = search_list.pop()
+            parameter_list.extend(mod._parameters.values())
+            search_list.extend(mod._modules.values())
+        return parameter_list
 
     def add_parameter(self, k: str, v: Any) -> Parameter:
         """
